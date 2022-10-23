@@ -1,0 +1,210 @@
+﻿@model ChatApplication.Models.IndexModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    
+<link rel="stylesheet" href="~/css/AccountIdentity.css">
+
+<link rel="stylesheet" href="~/css/Contacts.css">
+</head>
+<body onload="AddUser('')">
+    
+    <div class="Contacts">
+        <div id="ChangePhoto">
+      
+            @{
+                if(ViewBag.Photo == "" || ViewBag.Photo == null)
+                {
+                    <img class="myimg" style="float:none; position: absolute; top: 0; left: 35%; height:150px; width:150px" src="~/img/profile.png">
+                }
+                else
+                {
+                    <img class="myimg" style="float:none; position: absolute; top: 0; left: 35%; height:150px; width:150px" src="~/img/@ViewBag.Photo">
+                }
+            }
+        
+        <form enctype="multipart/form-data" asp-controller="Home" asp-action="UpdateUser" method="post">
+
+       
+          
+          <input name="UserPhoto" style="position: absolute; top:40%; left: 25%; color: white; border-radius: 10px; background-color: blueviolet;" type="file" value="Change Photo">
+          <br>
+          
+          
+          <br>
+           <button type="submit" style="font-size:x-large; position: absolute; top:80%; left: 35%; border:none;background-color:blueviolet; border-radius:10px; color:white">Change</button>
+
+          
+
+        </form>
+           <button onclick="hide()" style="font-size:x-large; position: absolute; top:70%; left: 35%; border:none;background-color:blueviolet; border-radius:10px; color:white">Close</button>
+
+      </div>
+        <nav style="width:97%">
+            <form asp-controller="Account" asp-action="LogOut">
+                <button type="submit" style="padding:10px; border:none;background-color:blueviolet; border-radius:10px; color:white">Logout</button>
+            </form>
+            
+           <button onclick="Show()" style="margin-right:10px; padding:10px; border:none;background-color:blueviolet; border-radius:10px; color:white">Change Photo</button>
+            
+         </nav>
+        @for(int i = 0; i < Model.users.Count; i++)
+        {
+            if(i == 0)
+            {
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+            }
+
+            <div  onclick="AddHash('@Model.users[i].UserName'); GetMessage(); AddUser('@Model.users[i].UserName.Split("@")[0]')" class="Item">
+
+                @{
+                    if(Model.users[i].UserPhoto == "" || Model.users[i].UserPhoto == null)
+                    {
+                        <img class="myimg" src="~/img/profile.png">
+                    }
+                    else
+                    {
+                        <img class="myimg" src="~/img/@Model.users[i].UserPhoto">
+                    }
+                }
+                    
+                    <div class="EveryContact"> 
+                        @Model.users[i].UserName.Split("@")[0]
+                        
+                        <p id="@Model.users[i].UserName" style="font-size:80%; color:grey;" >@Model.messages[i].message</p>
+                    </div>
+                
+        </div>
+       
+        }
+        
+       
+        
+
+        
+        
+    </div>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script>
+         let Show = function(){
+      $("#ChangePhoto").css("visibility" ,"visible");
+    
+    $("#ChangePhoto").animate({top: "30%" , left:"30%"});
+
+         }
+let hide = function() {
+    $("#ChangePhoto").animate({ top: "0%", left: "0%" }, 300, function() {
+        $("#ChangePhoto").css("visibility", "hidden");
+    });
+
+}
+        
+        let AddUser = function(Value){
+            if (Value == "") {
+                console.log("Nothing");
+                $(".Chat").hide();
+                $("body").css("grid-template-columns", "100% 0%");
+                $("nav").css("width", "98%");
+
+            }
+            else {
+                 document.getElementsByClassName("ContactName")[0].textContent = Value;
+                $(".Chat").show();
+                $("body").css("grid-template-columns", "60% 40%");
+                $("nav").css("width", "58%");
+
+
+            }
+           
+
+
+            
+        }
+    </script>
+    
+    <div class="Chat">
+        <div class="ContactName">
+            
+        </div>
+       <ul id="Messages">
+           
+               
+            
+       </ul>
+      <div style="background-color:transparent; width: 35%;height: 8%;position: absolute; bottom:0">
+        <textarea id="MessageTextArea"></textarea>
+        <form id="PersonalData">
+        <input type="hidden" name="sender" id="senderInput" value="@ViewBag.Sender"/>
+        <input type="hidden" name="receiver" id="receiverInput" />
+        </form>
+
+        <input  style="width: 12%; float:right ;"type="submit" id="sendButton" value="send">
+        
+      </div>
+       
+
+
+    </div>
+     <script src="~/lib/jquery/dist/jquery.js"></script>
+
+    <script>
+
+    let AddHash = function(Value) {
+    window.location.hash = Value
+        $("#Messages").empty();
+        
+        
+        var Location = (window.location.href).split("#")
+
+        document.getElementById("receiverInput").value = Location[Location.length - 1]      
+}
+    </script>
+    
+    <script>
+
+        let GetMessage = function(){
+
+        var data = $("#PersonalData").serialize();
+
+       console.log(data)
+            $.ajax({
+          
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                type: "POST",
+                url: "@Url.Action("GetMessages", "Home")",
+                data: data,
+                success: function(data) {
+                    var Location = (window.location.href).split("#")
+                    console.log(data)
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].userSender.userName == "@ViewBag.Sender") {
+                            $("#Messages").append("<li class='sender'> <div class= 'senderBox'>" + data[i].message + "</div > </li>");
+                        }
+                        else if(data[i].reciever.userName == "@ViewBag.Sender"){
+                            $("#Messages").append("<li class='receiver'> <div class= 'receiverBox'>" + data[i].message + "</div > </li>");
+
+                        }
+                          
+                    }
+        document.getElementsByClassName("Chat")[0].scrollTo(0 , document.getElementsByClassName("Chat")[0].scrollHeight)
+
+                    
+                },
+                error: function() {
+
+                }
+            });
+    }
+    </script>
+   
+    <script src="~/js/signalR/dist/browser/signalr.js"></script>
+    <script src="~/js/site.js"></script>
+
+</body>
+</html>

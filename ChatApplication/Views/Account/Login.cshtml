@@ -1,0 +1,75 @@
+﻿@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
+@model ChatApplication.ViewModels.LoginViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Document</title>
+    <link rel="stylesheet" href="~/css/AccountIdentity.css">
+
+</head>
+<body>
+    
+    
+ 
+        <nav>
+            <a asp-controller="Account" asp-action="Register">Register</a>
+            <a style="background-color: blueviolet;">Login</a>
+        </nav>
+    
+    
+        <div class="LoginForm">
+            <h1 style="color: White;">Login</h1>
+            <ul style="list-style:none" id="LoginErrors"></ul>
+            <form id="Login">
+                
+                <input asp-for="UserName" placeholder="User Name" type="text">
+                <br>
+                <input asp-for="password" placeholder="password" type="password">
+                <br>
+                
+            </form>
+            <input onclick="AddErrorsLogin()" type="submit" value="Login">
+        </div>
+  
+   <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+<script type="text/javascript">
+
+
+let AddErrorsLogin = function() {
+    $("#LoginErrors").empty()
+    var data = $("#Login").serialize();
+    $.ajax({
+        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+        type: "POST",
+        url: "@Url.Action("Login", "Account")",
+        data: data,
+
+        success: function(data) {
+           if (data == true) {
+                            
+                 window.location.href = "@Url.Action("index", "Home")";
+           }
+                        
+            else {
+                
+
+                for (var i = 0; i < data.length; i++) {
+                    $("#LoginErrors").append('<li style="color:red">' + data[i] + '</li>');
+                }
+            } 
+            
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+}
+</Script>
+   
+    
+</body>
+</html>

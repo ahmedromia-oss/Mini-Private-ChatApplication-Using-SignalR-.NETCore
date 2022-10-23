@@ -1,0 +1,14 @@
+﻿@model ChatApplication.ViewModels.UpdateUser
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<form asp-controller="Home" asp-action="UpdateUser">
+
+       
+          
+          <input onclick="console.log(this.value)" asp-for="UserPhoto" style="position: absolute; top:40%; left: 25%; color: white; border-radius: 10px; background-color: blueviolet;">
+          <br>
+          <input style="position: absolute; top:70%; left: 35%;" type="button" onclick="hide()" value="close">
+          <br>
+          <input style="position: absolute; top:80%; left: 35%;" type="submit" value="change">
+
+</form>
